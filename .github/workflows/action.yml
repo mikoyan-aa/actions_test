@@ -12,7 +12,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
       with:
-        fetch-depth: 0  # これにより全履歴がフェッチされる
+        fetch-depth: 0
 
     - name: Fetch remote main branch
       run: |
@@ -43,16 +43,11 @@ jobs:
 
     - name: Fail if changes found in app directory
       if: env.changes_in_app == 'true'
-      run: |
-        echo "Changes found in app directory. Closing pull request."
-        echo "::set-output name=result::failure"
-        exit 1
-
-    - name: Add comment and close PR
-      if: steps.check-path.outputs.result == 'failure'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
+        pr_number=${{ github.event.pull_request.number }};
         curl -s -H "Authorization: token $GITHUB_TOKEN" \
-             -X POST -d "{\"body\":\"Pull request closed due to changes in app directory.\", \"state\":\"closed\"}" \
-             "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}"
+             -X POST \
+             -d "{\"body\":\"Close this pull request due to change under app directory.\", \"state\":\"closed\"}" \
+             "https://api.github.com/repos/${{ github.repository }}/issues/${pr_number}"

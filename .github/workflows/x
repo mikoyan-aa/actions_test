@@ -9,16 +9,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
+    - name: リポジトリのチェックアウト
       uses: actions/checkout@v2
       with:
-        fetch-depth: 0
+        fetch-depth: 0  # 過去の全履歴をフェッチ
 
-    - name: Fetch remote main branch
+    - name: リモートのmainブランチをフェッチ
       run: |
         git fetch origin main
 
-    - name: Check for branch name with regex
+    - name: ブランチ名の正規表現チェック
       id: check_branch
       run: |
         if [[ "${{ github.event.pull_request.head.ref }}" =~ ^feature/LETRO-[0-9]+$ ]]; then
@@ -27,7 +27,7 @@ jobs:
           echo "target_branch=false" >> $GITHUB_ENV
         fi
 
-    - name: Check for changes in app directory
+    - name: appディレクトリに変更があるかをチェック
       id: check_changes
       run: |
         if [[ "${{ env.target_branch }}" == "true" ]]; then
@@ -41,7 +41,7 @@ jobs:
           echo "changes_in_app=false" >> $GITHUB_ENV
         fi
 
-    - name: Fail if changes found in app directory
+    - name: 変更があればプルリクエストをクローズ
       if: env.changes_in_app == 'true'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -49,10 +49,10 @@ jobs:
         pr_number=${{ github.event.pull_request.number }};
         curl -s -H "Authorization: token $GITHUB_TOKEN" \
              -X PATCH \
-             -d "{\"body\":\"Close this pull request due to change under app directory.\", \"state\":\"closed\"}" \
+             -d "{\"body\":\"appディレクトリに変更があったため、プルリクエストをクローズします。\", \"state\":\"closed\"}" \
              "https://api.github.com/repos/${{ github.repository }}/issues/${pr_number}"
 
-    - name: Record closing the pull request
+    - name: プルリクエストがクローズされたことを記録
       if: env.changes_in_app == 'true'
       run: |
-        echo "This pull request is closed: ${{ github.event.pull_request.number }}"
+        echo "プルリクエストがクローズされました: ${{ github.event.pull_request.number }}"

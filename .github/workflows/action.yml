@@ -44,10 +44,10 @@ jobs:
     - name: Fail if changes found in app directory
       if: env.changes_in_app == 'true'
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        CUSTOM_GITHUB_TOKEN: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
       run: |
         pr_number=${{ github.event.pull_request.number }};
-        curl -s -H "Authorization: token $GITHUB_TOKEN" \
+        curl -s -H "Authorization: token $CUSTOM_GITHUB_TOKEN" \
              -X PATCH \
              -d "{\"body\":\"Close this pull request due to change under app directory.\", \"state\":\"closed\"}" \
              "https://api.github.com/repos/${{ github.repository }}/issues/${pr_number}"

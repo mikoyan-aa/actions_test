@@ -21,7 +21,7 @@ jobs:
     - name: Check for branch name with regex
       id: check_branch
       run: |
-        if [[ "${{ github.event.pull_request.head.ref }}" =~ ^feature/LETRO-[0-9]+$ ]]; then
+        if [[ "${{ github.event.pull_request.head.ref }}" =~ ^feature/LETRO_[0-9]+.*$ ]]; then
           echo "target_branch=true" >> $GITHUB_ENV
         else
           echo "target_branch=false" >> $GITHUB_ENV

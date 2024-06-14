@@ -15,7 +15,9 @@ jobs:
         fetch-depth: 0  # これにより全履歴がフェッチされる
 
     - name: Fetch remote main branch
-      run: git fetch origin main
+      run: |
+        git fetch --all
+        git fetch origin main
 
     - name: Check for branch name with regex
       id: check_branch

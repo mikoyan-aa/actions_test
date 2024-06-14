@@ -49,7 +49,7 @@ jobs:
         pr_number=${{ github.event.pull_request.number }};
         curl -s -H "Authorization: token $CUSTOM_GITHUB_TOKEN" \
              -X PATCH \
-             -d "{\"body\":\"Close this pull request due to change under app directory.\", \"state\":\"closed\"}" \
+             -d "{\"body\":\"Closed this pull request due to detect change(s) under app directory.\", \"state\":\"closed\"}" \
              "https://api.github.com/repos/${{ github.repository }}/issues/${pr_number}"
 
     - name: Record closing the pull request

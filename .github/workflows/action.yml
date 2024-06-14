@@ -1,7 +1,7 @@
 name: To avoid sending pull request for relating UTs when under app directory changes
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, synchronize]
 
 jobs:
@@ -10,7 +10,7 @@ jobs:
     
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
 
@@ -48,6 +48,6 @@ jobs:
       run: |
         pr_number=${{ github.event.pull_request.number }};
         curl -s -H "Authorization: token $GITHUB_TOKEN" \
-             -X POST \
+             -X PATCH \
              -d "{\"body\":\"Close this pull request due to change under app directory.\", \"state\":\"closed\"}" \
              "https://api.github.com/repos/${{ github.repository }}/issues/${pr_number}"

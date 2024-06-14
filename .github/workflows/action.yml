@@ -7,7 +7,7 @@ on:
 jobs:
   check-diff-app:
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
@@ -16,13 +16,12 @@ jobs:
 
     - name: Fetch remote main branch
       run: |
-        git fetch --all
         git fetch origin main
 
     - name: Check for branch name with regex
       id: check_branch
       run: |
-        if [[ "${{ github.head_ref }}" =~ ^feature/LETRO-[0-9]+$ ]]; then
+        if [[ "${{ github.event.pull_request.head.ref }}" =~ ^feature/LETRO-[0-9]+$ ]]; then
           echo "target_branch=true" >> $GITHUB_ENV
         else
           echo "target_branch=false" >> $GITHUB_ENV
@@ -32,7 +31,7 @@ jobs:
       id: check_changes
       run: |
         if [[ "${{ env.target_branch }}" == "true" ]]; then
-          if git diff --name-only origin/main...${{ github.sha }} | grep '^app/'; then
+          if git diff --name-only origin/main...HEAD | grep '^app/'; then
             echo "changes_in_app=true" >> $GITHUB_ENV
           else
             echo "changes_in_app=false" >> $GITHUB_ENV

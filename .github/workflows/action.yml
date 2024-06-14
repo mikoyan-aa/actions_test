@@ -30,7 +30,7 @@ jobs:
         id: check_changes
         run: |
           if [[ "${{ env.target_branch }}" == "true" ]]; then
-            if git diff --name-only origin/main...${{ github.event.pull_request.head.sha }} | grep '^app/'; then
+            if git diff --name-only origin/main...${{ github.sha }} | grep '^app/'; then
               echo "changes_in_app=true" >> $GITHUB_ENV
             else
               echo "changes_in_app=false" >> $GITHUB_ENV

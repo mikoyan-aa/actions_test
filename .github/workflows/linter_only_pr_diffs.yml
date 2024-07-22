@@ -1,0 +1,45 @@
+name: Run linter for applying only pull request diff codes
+
+on:
+  pull_request:
+    paths:
+      - 'app/**/*.php'
+    types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - develop
+      - main
+
+jobs:
+  linter:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install PHP and PHP-CS-Fixer
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.3'
+          tools: php-cs-fixer:2.19, composer:v1, phpunit:7.5
+
+      # - name: Run PHP-CS-Fixer (dry-run)
+      #   run: |
+      #     php-cs-fixer fix --dry-run --diff --diff-format=udiff --using-cache=no . || true
+
+      - name: Fetch pull request diff
+        id: diff
+        run: |
+          git fetch origin ${{ github.event.pull_request.base.sha }} --depth=1
+          git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }} | grep '\.php$' > diff_files.txt
+          cat diff_files.txt
+
+      - name: Run PHP CS Fixer
+        run: |
+          if [ -s diff_files.txt ]; then
+            while IFS= read -r file; do
+              php-cs-fixer fix $file --dry-run --diff
+            done < diff_files.txt
+          else
+            echo "No PHP files to fix."
+          fi
